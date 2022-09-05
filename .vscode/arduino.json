@@ -1,0 +1,7 @@
+{
+    "configuration": "cpu=atmega328",
+    "board": "arduino:avr:diecimila",
+    "programmer": "arduino:avrispmkii",
+    "sketch": "servo.ino",
+    "port": "COM6"
+}
