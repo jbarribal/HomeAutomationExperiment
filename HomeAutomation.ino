@@ -7,13 +7,13 @@ const int trigPin = 13;
 const int echoPin = 12;
 const int servo = 11;
 const int pir = 10;
-const int led1 = 9;
-const int led2 = 8;
-const int led3 = 7;
-const int led4 = 6;
-const int buzzer =5;
+const int yellowLed = 9;
+const int blueLed = 5;
+const int redLed = 3;
+const int greenLed = 6;
+const int buzzer =8;
 const int driverInput1 = 4;
-const int driverInput2 = 3;
+const int driverInput2 = 7;
 const int enable = 2;
 const int ldrPin = A0;
 const int tempPin = A1;
@@ -29,10 +29,10 @@ void setup() {
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
   pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
   pinMode(buzzer,OUTPUT);
-  pinMode(led1,OUTPUT);
-  pinMode(led2, OUTPUT);
-  pinMode(led3, OUTPUT);
-  pinMode(led4, OUTPUT);
+  pinMode(greenLed,OUTPUT);
+  pinMode(blueLed, OUTPUT);
+  pinMode(yellowLed, OUTPUT);
+  pinMode(redLed, OUTPUT);
   pinMode(pir, INPUT);
   pinMode(driverInput1, OUTPUT);
   pinMode(driverInput2, OUTPUT);
@@ -45,14 +45,30 @@ void loop() {
   servoClose();
   checkForMovement();
   checkForLdrSensor();
+  checkForTemperature();
   delay(100);
   
+}
+
+void checkForTemperature(){
+  getTemperature();
+  if (tempVal < 20){
+    ledOn(blueLed);
+
+  }
+  else if(tempVal >= 20 && tempVal <= 24){
+    ledOn(greenLed);
+  }
+  else if(tempVal >24){
+    ledOn(redLed);
+    runMotor();
+  }
 }
 
 void checkForMovement(){
   readPirSensor(pir);
   if(pirStatus == true){
-    blink(led1);
+    blink(yellowLed);
     buzz(buzzer);
     delay(3000);
   }
@@ -109,34 +125,33 @@ void buzz(int buzzer){
   tone(buzzer,100,3000);
 }
 
-void readLdr(){
+void mapLDRValue(){
   ldrVal = analogRead(ldrPin);
-  ldrVal = map(ldrVal, 3, 450, 0,200);
-  Serial.println(ldrVal);
+  ldrVal = map(ldrVal, 3, 450, 0,255);
 }
 
-void analogWriteLed(int value){
-  analogWrite(led2,value);
-  analogWrite(led3,value);
-  analogWrite(led4,value);
+void analogWriteLeds(int value){
+  analogWrite(greenLed,value);
+  analogWrite(blueLed,value);
+  analogWrite(redLed,value);
 }
 
 void checkForLdrSensor(){
-  readLdr();
-  analogWriteLed(ldrVal);
+  mapLDRValue();
+  analogWriteLeds(ldrVal);
 }
 
-void readTemperature(){
+void getTemperature(){
   tempVal = analogRead(tempPin);
 }
 
-int setSpeed(){
-  
+void runMotor(){
+  digitalWrite(driverInput1, HIGH);
+  digitalWrite(driverInput2, LOW);
+  digitalWrite(enable, HIGH);
 }
 
 
-void runMotor(int speed){
-  analogWrite(enable, speed);
-  digitalWrite(driverInput1, HIGH);
-  digitalWrite(driverInput2, LOW);
+void ledOn(int ledPin){
+  digitalWrite(ledPin, HIGH);
 }
