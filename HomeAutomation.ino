@@ -51,10 +51,9 @@ void loop() {
 }
 
 void checkForTemperature(){
-  getTemperature();
+  mapTemperature();
   if (tempVal < 20){
     ledOn(blueLed);
-
   }
   else if(tempVal >= 20 && tempVal <= 24){
     ledOn(greenLed);
@@ -140,8 +139,9 @@ void checkForLdrSensor(){
   analogWriteLeds(ldrVal);
 }
 
-void getTemperature(){
+void mapTemperature(){
   tempVal = analogRead(tempPin);
+  tempVal = map(tempVal, 0, 1023, -40,125);
 }
 
 void runMotor(){
