@@ -91,7 +91,6 @@ void checkForPerson(){
   }
 }
 
-
 void ultraSonicScan(int trigPin, int echoPin){
       // Clears the trigPin condition
   digitalWrite(trigPin, LOW);
@@ -150,7 +149,6 @@ void runMotor(){
   digitalWrite(driverInput2, LOW);
   digitalWrite(enable, HIGH);
 }
-
 
 void ledOn(int ledPin){
   digitalWrite(ledPin, HIGH);
