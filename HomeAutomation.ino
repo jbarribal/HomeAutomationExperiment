@@ -6,14 +6,16 @@ Servo myservo;  // create servo object to control a servo
 const int trigPin = 13;
 const int echoPin = 12;
 const int servo = 11;
-const int pir = 10;
+const int pir = 2;
 const int yellowLed = 9;
+const int yellowLed2 = 4;
+const int greenLed2 =1;
 const int blueLed = 5;
+const int blueLed2 = 7; 
 const int redLed = 3;
 const int greenLed = 6;
 const int buzzer =8;
-const int driverInput1 = 4;
-const int driverInput2 = 7;
+const int motor = 10;
 const int enable = 2;
 const int ldrPin = A0;
 const int tempPin = A1;
@@ -34,47 +36,53 @@ void setup() {
   pinMode(yellowLed, OUTPUT);
   pinMode(redLed, OUTPUT);
   pinMode(pir, INPUT);
-  pinMode(driverInput1, OUTPUT);
-  pinMode(driverInput2, OUTPUT);
+  pinMode(motor, OUTPUT);
   Serial.begin(9600);
 }
 
 void loop() {
-
   checkForPerson();
   servoClose();
   checkForMovement();
   checkForLdrSensor();
-  checkForTemperature();
-  delay(100);
-  
+  //checkForTemperature();
 }
 
 void checkForTemperature(){
+  Serial.print("Checking for temperature");
   mapTemperature();
   if (tempVal < 20){
-    ledOn(blueLed);
+    ledOn(blueLed2);
+    Serial.println("Temperature");
+    Serial.print(tempVal);
+    delay(100);
   }
   else if(tempVal >= 20 && tempVal <= 24){
-    ledOn(greenLed);
+    ledOn(greenLed2);
+    Serial.println("Temperature");
+    Serial.print(tempVal);
+    delay(100);
   }
-  else if(tempVal >24){
+  else if(tempVal >=25){
     ledOn(redLed);
+    Serial.print("Temperature");
+    Serial.println(tempVal);
     runMotor();
   }
 }
 
 void checkForMovement(){
-  readPirSensor(pir);
+  readPirSensor();
+  Serial.print("PIR Status: ");
+  Serial.println(pirStatus);
   if(pirStatus == true){
-    blink(yellowLed);
     buzz(buzzer);
-    delay(3000);
+    blink(yellowLed);
   }
 }
 
-void readPirSensor(int pirSensor){
-  pirStatus = digitalRead(pirSensor);
+void readPirSensor(){
+  pirStatus = digitalRead(pir);
 }
 
 void checkForPerson(){
@@ -114,9 +122,15 @@ void servoClose(){
 }
 
 void blink(int ledPin){
-  digitalWrite(ledPin, HIGH);
-  delay(100);
-  digitalWrite(ledPin, LOW);
+  int count = 30;
+  if(pirStatus == true){
+    for(int i = 0; i < count; i++){
+      digitalWrite(ledPin, HIGH);
+      delay(100);
+      digitalWrite(ledPin, LOW);
+      delay(100);
+    }
+  }
 }
 
 void buzz(int buzzer){
@@ -129,25 +143,25 @@ void mapLDRValue(){
 }
 
 void analogWriteLeds(int value){
-  analogWrite(greenLed,value);
   analogWrite(blueLed,value);
+  analogWrite(greenLed,value);
   analogWrite(redLed,value);
 }
 
 void checkForLdrSensor(){
   mapLDRValue();
   analogWriteLeds(ldrVal);
+  Serial.print("LDR Value: ");
+  Serial.println(ldrVal);
 }
 
 void mapTemperature(){
   tempVal = analogRead(tempPin);
-  tempVal = map(tempVal, 0, 1023, -40,125);
+  tempVal = tempVal * 0.48;
 }
 
 void runMotor(){
-  digitalWrite(driverInput1, HIGH);
-  digitalWrite(driverInput2, LOW);
-  digitalWrite(enable, HIGH);
+  analogWrite(motor, 255);
 }
 
 void ledOn(int ledPin){
